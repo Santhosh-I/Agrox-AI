@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Disease Detection - AGROX AI{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h2 class="hero-title">AI-Powered Crop Disease Detection</h2>
+            <p class="hero-description">Upload a leaf image to get instant disease diagnosis and treatment recommendations powered by advanced machine learning.</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="upload-section">
+        <div class="upload-card">
+            <div class="upload-header">
+                <h3>🔍 Detect Plant Disease</h3>
+                <p>Upload a clear image of the affected plant leaf</p>
+            </div>
+            
+            <form method="POST" action="{{ url_for('detect_disease') }}" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+                <div class="file-input-container">
+                    <input type="file" 
+                           name="image" 
+                           id="imageInput" 
+                           accept="image/png,image/jpg,image/jpeg,image/gif" 
+                           required>
+                    <label for="imageInput" class="file-input-label">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">
+                            <span class="primary-text">Choose Image</span>
+                            <span class="secondary-text">PNG, JPG, JPEG up to 16MB</span>
+                        </div>
+                    </label>
+                    <div class="file-preview" id="filePreview"></div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                    <span class="btn-text">🔬 Analyze Disease</span>
+                    <span class="btn-loading" style="display: none;">
+                        <span class="spinner"></span> Analyzing...
+                    </span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Feature Preview Cards -->
+        <div class="features-preview">
+            <div class="feature-card">
+                <div class="feature-icon">🌡️</div>
+                <h4>IoT Monitoring</h4>
+                <p>Real-time soil and environmental monitoring</p>
+                <span class="coming-soon">Coming Soon</span>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎤</div>
+                <h4>Voice Assistant</h4>
+                <p>Hands-free agricultural guidance and support</p>
+                <span class="coming-soon">Coming Soon</span>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h4>AI Chatbot</h4>
+                <p>24/7 farming advice and expert consultation</p>
+                <span class="coming-soon">Coming Soon</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Detection Results - AGROX AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="results-section">
+        <!-- Results Header -->
+        <div class="results-header">
+            <h2>🔬 Disease Analysis Complete</h2>
+            <p class="results-timestamp">Analyzed on {{ result.timestamp }}</p>
+        </div>
+
+        <!-- Results Content -->
+        <div class="results-content">
+            <!-- Image Display -->
+            <div class="image-container">
+                <img src="{{ url_for('static', filename=result.image_path) }}" 
+                     alt="Analyzed leaf image" 
+                     class="result-image">
+                <div class="image-overlay">
+                    <span class="confidence-badge">{{ result.confidence }}% Confidence</span>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="analysis-results">
+                <!-- Disease Detection Card -->
+                <div class="result-card primary">
+                    <div class="card-header">
+                        <h3>🦠 Detected Condition</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="disease-name">{{ result.disease_name }}</div>
+                        <div class="confidence-info">
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: {{ result.confidence }}%"></div>
+                            </div>
+                            <span class="confidence-text">{{ result.confidence }}% Accuracy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Treatment Card -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>💊 Recommended Treatment</h3>
+                    </div>
+                    <div class="card-content">
+                        <p class="treatment-text">{{ result.treatment }}</p>
+                        <div class="treatment-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Pesticide:</span>
+                                <span class="detail-value">{{ result.pesticide }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Dosage:</span>
+                                <span class="detail-value">{{ result.dosage }}</span>
+                            </div>
+                        </div>
+                        <div class="cost-info">
+                            <span class="cost-label">Estimated Cost:</span>
+                            <span class="cost-value">{{ result.cost }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prevention Card -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>🛡️ Prevention Tips</h3>
+                    </div>
+                    <div class="card-content">
+                        <p class="prevention-text">{{ result.prevention }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="speakResults()" id="speakBtn">
+                🔊 Play Audio
+            </button>
+            <button class="btn btn-outline" onclick="downloadReport()">
+                📄 Download Report
+            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                🔄 Analyze Another
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enhanced result data for audio and download features
+const resultData = {
+    disease: "{{ result.disease_name }}",
+    confidence: "{{ result.confidence }}",
+    treatment: "{{ result.treatment }}",
+    prevention: "{{ result.prevention }}",
+    pesticide: "{{ result.pesticide }}",
+    dosage: "{{ result.dosage }}",
+    cost: "{{ result.cost }}"
+};
+</script>
+{% endblock %}

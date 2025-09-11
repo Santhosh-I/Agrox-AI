@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AGROX AI - Advanced crop disease detection using artificial intelligence">
+    <title>{% block title %}AGROX AI - Smart Agriculture Platform{% endblock %}</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🌱 AGROX AI</h1>
+                    <span class="tagline">Smart Agriculture</span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="{{ url_for('index') }}" class="nav-link active">Disease Detection</a>
+                    <a href="#" class="nav-link disabled">IoT Dashboard</a>
+                    <a href="#" class="nav-link disabled">Voice Assistant</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                <div class="container">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <span class="flash-icon">
+                                {% if category == 'error' %}⚠️{% else %}✅{% endif %}
+                            </span>
+                            {{ message }}
+                            <button class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p>&copy; 2025 AGROX AI. Empowering farmers with AI technology.</p>
+                    <p class="footer-tagline">Smart Farming, Smarter Future</p>
+                </div>
+                <div class="footer-features">
+                    <span class="feature-badge">✅ Disease Detection</span>
+                    <span class="feature-badge disabled">🚧 IoT Monitoring</span>
+                    <span class="feature-badge disabled">🚧 Voice Assistant</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
