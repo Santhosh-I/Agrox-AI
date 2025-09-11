@@ -263,14 +263,19 @@ def get_disease_info(disease_name):
     return info
 
 @app.route('/')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/detect-disease')  # Rename the old index route
 def index():
     return render_template('index.html')
 
+# Update the redirect in detect_disease function
 @app.route('/detect', methods=['POST'])
 def detect_disease():
     if 'image' not in request.files:
         flash('No image file uploaded', 'error')
-        return redirect(url_for('index'))
+        return redirect(url_for('index'))  # This stays the same
 
     file = request.files['image']
     

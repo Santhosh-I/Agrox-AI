@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}AGROX AI - Smart Agriculture Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-background">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="highlight">AGROX AI</span>
+                    <span class="tagline">Smart Agriculture Revolution</span>
+                </h1>
+                <p class="hero-description">
+                    Revolutionize your farming with AI-powered disease detection, 
+                    IoT monitoring, and intelligent agricultural guidance. 
+                    Increase crop yield by 30% and reduce losses with cutting-edge technology.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">95%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">25+</span>
+                        <span class="stat-label">Diseases</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">3sec</span>
+                        <span class="stat-label">Detection</span>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary btn-hero">
+                        🔬 Start Disease Detection
+                    </a>
+                    <a href="#features" class="btn btn-outline btn-secondary">
+                        📖 Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="plant-graphic">🌿</div>
+                <div class="floating-elements">
+                    <div class="element element-1">🔍</div>
+                    <div class="element element-2">📊</div>
+                    <div class="element element-3">🎤</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section">
+    <div class="container">
+        <h2 class="section-title">Comprehensive Agricultural Intelligence</h2>
+        <p class="section-description">Three powerful tools integrated into one platform</p>
+        
+        <div class="features-grid">
+            <!-- Disease Detection Feature -->
+            <div class="feature-card active">
+                <div class="feature-icon">
+                    <div class="icon-bg">🦠</div>
+                </div>
+                <h3>AI Disease Detection</h3>
+                <p>Upload leaf images and get instant disease identification with 95% accuracy. Receive detailed treatment recommendations with precise dosages and cost estimates.</p>
+                <div class="feature-benefits">
+                    <span class="benefit">✓ Instant Results</span>
+                    <span class="benefit">✓ Cost Analysis</span>
+                    <span class="benefit">✓ Voice Output</span>
+                </div>
+                <a href="{{ url_for('index') }}" class="feature-link">Try Now →</a>
+            </div>
+
+            <!-- IoT Monitoring Feature -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <div class="icon-bg">🌡️</div>
+                </div>
+                <h3>IoT Farm Monitoring</h3>
+                <p>Real-time monitoring of soil health, moisture levels, pH, and environmental parameters. Get automated alerts and irrigation recommendations.</p>
+                <div class="feature-benefits">
+                    <span class="benefit">✓ Real-time Data</span>
+                    <span class="benefit">✓ Smart Alerts</span>
+                    <span class="benefit">✓ Automation</span>
+                </div>
+                <div class="feature-link coming-soon">Coming Soon</div>
+            </div>
+
+            <!-- Voice Assistant Feature -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <div class="icon-bg">🎙️</div>
+                </div>
+                <h3>AI Voice Assistant</h3>
+                <p>Get 24/7 agricultural guidance through voice commands. Ask questions about farming practices, weather advice, and crop management.</p>
+                <div class="feature-benefits">
+                    <span class="benefit">✓ Hands-free</span>
+                    <span class="benefit">✓ Multilingual</span>
+                    <span class="benefit">✓ Expert Advice</span>
+                </div>
+                <div class="feature-link coming-soon">Coming Soon</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Problem & Solution Section -->
+<section class="problem-solution-section">
+    <div class="container">
+        <div class="problem-solution-grid">
+            <div class="problem-side">
+                <h3>⚠️ Current Farming Challenges</h3>
+                <ul class="problem-list">
+                    <li>42% crop loss due to undiagnosed diseases</li>
+                    <li>Limited access to agricultural experts</li>
+                    <li>Over-application of expensive pesticides</li>
+                    <li>Manual monitoring leads to delayed responses</li>
+                </ul>
+            </div>
+            <div class="solution-side">
+                <h3>✅ AGROX AI Solutions</h3>
+                <ul class="solution-list">
+                    <li>Instant AI-powered disease identification</li>
+                    <li>24/7 expert guidance through AI</li>
+                    <li>Precise dosage recommendations save costs</li>
+                    <li>Real-time IoT monitoring & alerts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Transform Your Farm?</h2>
+        <p>Join thousands of farmers already using AGROX AI to increase yields and reduce losses</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-large">
+                🚀 Start Free Detection
+            </a>
+            <div class="cta-note">
+                <small>✨ No registration required • Instant results • Free to use</small>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

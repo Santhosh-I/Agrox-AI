@@ -754,3 +754,451 @@ body {
         gap: 0.25rem;
     }
 }
+
+
+
+/*------------------------- landing page -------------------------------------------
+
+/* Landing Page Styles */
+.hero-section {
+    background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 50%, #81C784 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-background {
+    width: 100%;
+    position: relative;
+}
+
+.hero-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    color: white;
+    text-align: left;
+    z-index: 2;
+    position: relative;
+    max-width: 600px;
+}
+
+.hero-title {
+    margin-bottom: 2rem;
+}
+
+.highlight {
+    display: block;
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.tagline {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 300;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+.hero-description {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #FFD700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-hero {
+    padding: 1.2rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    transform: scale(1);
+    transition: all 0.3s ease;
+}
+
+.btn-hero:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.hero-image {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.plant-graphic {
+    font-size: 15rem;
+    opacity: 0.7;
+    animation: float 6s ease-in-out infinite;
+}
+
+.floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.element {
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.6;
+    animation: float 4s ease-in-out infinite;
+}
+
+.element-1 {
+    top: 20%;
+    left: 20%;
+    animation-delay: -1s;
+}
+
+.element-2 {
+    top: 60%;
+    right: 20%;
+    animation-delay: -2s;
+}
+
+.element-3 {
+    bottom: 20%;
+    left: 40%;
+    animation-delay: -3s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Features Section */
+.features-section {
+    padding: 5rem 0;
+    background: var(--background-white);
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+}
+
+.section-description {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-gray);
+    margin-bottom: 4rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    background: var(--background-white);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    box-shadow: 0 8px 25px rgba(76, 175, 80, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover::before {
+    transform: scaleX(1);
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(76, 175, 80, 0.2);
+    border-color: var(--light-green);
+}
+
+.feature-card.active {
+    border-color: var(--primary-green);
+    transform: translateY(-4px);
+}
+
+.feature-card.active::before {
+    transform: scaleX(1);
+}
+
+.feature-icon {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.icon-bg {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto;
+    box-shadow: var(--shadow);
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.feature-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.benefit {
+    background: var(--light-green);
+    color: var(--dark-green);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.feature-link {
+    display: block;
+    text-align: center;
+    color: var(--primary-green);
+    font-weight: 700;
+    text-decoration: none;
+    padding: 1rem;
+    border-radius: var(--radius-small);
+    transition: all 0.3s ease;
+}
+
+.feature-link:hover {
+    background: var(--primary-green);
+    color: white;
+}
+
+.feature-link.coming-soon {
+    color: var(--text-gray);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Problem Solution Section */
+.problem-solution-section {
+    padding: 5rem 0;
+    background: var(--background-light);
+}
+
+.problem-solution-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.problem-side h3 {
+    color: #D32F2F;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.solution-side h3 {
+    color: var(--primary-green);
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.problem-list, .solution-list {
+    list-style: none;
+    padding: 0;
+}
+
+.problem-list li, .solution-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.problem-list li::before {
+    content: '❌ ';
+    margin-right: 0.5rem;
+}
+
+.solution-list li::before {
+    content: '✅ ';
+    margin-right: 0.5rem;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 5rem 0;
+    background: var(--gradient);
+    color: white;
+    text-align: center;
+}
+
+.cta-section h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+    opacity: 0.9;
+}
+
+.btn-large {
+    padding: 1.5rem 3rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.cta-note {
+    margin-top: 2rem;
+    opacity: 0.8;
+}
+
+/* Responsive Design for Landing Page */
+@media (max-width: 1024px) {
+    .hero-image {
+        display: none;
+    }
+    
+    .hero-content {
+        max-width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .highlight {
+        font-size: 3rem;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .problem-solution-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .btn-hero, .btn-large {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .highlight {
+        font-size: 2.5rem;
+    }
+    
+    .tagline {
+        font-size: 1.2rem;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
