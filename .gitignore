@@ -1,0 +1,27 @@
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Environment/config files (secrets, keys)
+.env
+
+
+# Uploaded files (if you don’t want user uploads in git)
+static/uploads/
+
