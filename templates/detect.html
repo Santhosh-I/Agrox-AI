@@ -34,7 +34,8 @@
                         <div class="disease-name">{{ result.disease_name }}</div>
                         <div class="confidence-info">
                             <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: {{ result.confidence }}%"></div>
+                                    <div class="confidence-fill" style="--confidence: {{ result.confidence }};"></div>
+
                             </div>
                             <span class="confidence-text">{{ result.confidence }}% Accuracy</span>
                         </div>
