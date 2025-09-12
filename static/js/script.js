@@ -351,3 +351,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+
+// ✅ Fixed browser recording with supported format
+async function startRecording() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                sampleRate: 44100,  // Use standard sample rate
+                channelCount: 1,    // Mono audio
+                echoCancellation: true,
+                noiseSuppression: true
+            }
+        });
+        
+        // ✅ Use supported MIME type
+        let options = { mimeType: 'audio/webm;codecs=opus' };
+        
+        // ✅ Fallback for different browsers
+        if (!MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            if (MediaRecorder.isTypeSupported('audio/webm')) {
+                options = { mimeType: 'audio/webm' };
+            } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+                options = { mimeType: 'audio/ogg;codecs=opus' };
+            } else {
+                options = {}; // Use browser default
+            }
+        }
+        
+        mediaRecorder = new MediaRecorder(stream, options);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: options.mimeType || 'audio/webm' });
+            sendAudioToServer(audioBlob);
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        updateRecordingUI(true);
+
+    } catch (error) {
+        console.error('Recording setup error:', error);
+        alert('Microphone access denied. Please enable microphone permissions and refresh the page.');
+    }
+}
+
+

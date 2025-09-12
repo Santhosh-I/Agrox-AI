@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file  # ✅ Added send_file
 from werkzeug.utils import secure_filename
 import os
 import numpy as np
@@ -8,6 +8,23 @@ from datetime import datetime
 import uuid
 import requests
 import json
+
+#----------------------------------------------new-----------------------------------------------------
+import whisper
+import speech_recognition as sr
+from pydub import AudioSegment
+import io
+import pyttsx3
+from gtts import gTTS
+import pygame
+import tempfile
+import shutil
+import os
+from transformers import pipeline
+from contextlib import contextmanager
+
+#----------------------------------------------new-----------------------------------------------------
+
 
 app = Flask(__name__)
 app.secret_key = 'agrox-ai-secret-key-2025'
@@ -732,6 +749,398 @@ def get_disease_info(disease_name):
         'safety': 'Follow expert guidance',
         'youtube_videos': [{"title": "General Plant Care", "url": "https://www.youtube.com/results?search_query=plant+disease+management"}]
     })
+#------------------------------------------------------------------------------------------------------
+
+import requests
+import urllib3
+import ssl
+import os
+
+# ⚠️ DEVELOPMENT ONLY - Disable SSL verification
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+os.environ['CURL_CA_BUNDLE'] = ''
+ssl._create_default_https_context = ssl._create_unverified_context
+
+# Monkey patch requests to disable SSL verification
+import requests.adapters
+original_send = requests.adapters.HTTPAdapter.send
+
+def patched_send(self, request, *args, **kwargs):
+    kwargs['verify'] = False
+    return original_send(self, request, *args, **kwargs)
+
+requests.adapters.HTTPAdapter.send = patched_send
+
+
+#----------------------------------------------new-----------------------------------------------------
+# Load Whisper model (supports 99+ languages including Tamil)
+whisper_asr = pipeline(
+    "automatic-speech-recognition",
+    model="openai/whisper-base",
+    framework="pt"   # ✅ important
+)
+
+
+def transcribe_audio(audio_file):
+    """Convert speech to text using Whisper with comprehensive error handling"""
+    print(f"🎤 Starting transcription for: {audio_file}")
+    
+    try:
+        # Check if file exists and has content
+        if not os.path.exists(audio_file):
+            print(f"❌ File not found: {audio_file}")
+            return None
+        
+        file_size = os.path.getsize(audio_file)
+        print(f"📁 Audio file size: {file_size} bytes")
+        
+        if file_size == 0:
+            print("❌ Empty audio file")
+            return None
+        
+        # Try direct transcription first
+        print("🔄 Attempting direct Whisper transcription...")
+        result = whisper_asr(audio_file)
+        
+        print(f"✅ Raw Whisper result: {result}")
+        
+        if result and 'text' in result and result['text'].strip():
+            transcribed_text = result['text'].strip()
+            print(f"✅ Transcription successful: '{transcribed_text}'")
+            
+            return {
+                'text': transcribed_text,
+                'language': detect_language(transcribed_text),
+                'confidence': 0.85
+            }
+        else:
+            print("❌ Whisper returned empty or invalid result")
+            
+            # Try with audio preprocessing
+            print("🔄 Trying with audio preprocessing...")
+            try:
+                import librosa
+                import soundfile as sf
+                
+                # Load and preprocess audio
+                audio_data, sr = librosa.load(audio_file, sr=16000)
+                duration = len(audio_data) / sr
+                print(f"🎵 Audio duration: {duration:.2f} seconds, sample rate: {sr}")
+                
+                if duration < 0.5:
+                    print("❌ Audio too short (< 0.5 seconds)")
+                    return None
+                
+                # Save preprocessed audio
+                temp_processed = f"temp_processed_{uuid.uuid4().hex}.wav"
+                sf.write(temp_processed, audio_data, 16000)
+                
+                # Try transcription again
+                result = whisper_asr(temp_processed)
+                os.unlink(temp_processed)  # Cleanup
+                
+                if result and 'text' in result and result['text'].strip():
+                    transcribed_text = result['text'].strip()
+                    print(f"✅ Preprocessing successful: '{transcribed_text}'")
+                    
+                    return {
+                        'text': transcribed_text,
+                        'language': detect_language(transcribed_text),
+                        'confidence': 0.85
+                    }
+                else:
+                    print("❌ Preprocessing also failed - no text output")
+                    return None
+                    
+            except ImportError as e:
+                print(f"❌ Missing audio libraries: {e}")
+                print("Install with: pip install librosa soundfile")
+                return None
+            except Exception as e:
+                print(f"❌ Audio preprocessing error: {e}")
+                return None
+        
+    except Exception as e:
+        print(f"❌ Transcription error: {type(e).__name__}: {e}")
+        import traceback
+        print(f"Full traceback: {traceback.format_exc()}")
+        return None
+
+
+
+    
+def setup_multilingual_llm():
+    """Setup multiple LLM endpoints for different languages"""
+    llm_configs = {
+        'english': {
+            'url': "http://127.0.0.1:11434/api/generate",
+            'model': "mistral"
+        },
+        'tamil': {
+            'url': "http://127.0.0.1:11435/api/generate",  # Different port for Tamil model
+            'model': "tamil-llama"  # Or other Tamil-capable model
+        }
+    }
+    return llm_configs
+
+def detect_language(text):
+    """Simple language detection"""
+    tamil_chars = any('\u0b80' <= char <= '\u0bff' for char in text)
+    english_chars = any('a' <= char.lower() <= 'z' for char in text)
+    
+    if tamil_chars and english_chars:
+        return 'tanglish'  # Mixed language
+    elif tamil_chars:
+        return 'tamil'
+    else:
+        return 'english'
+
+def query_multilingual_llm(prompt, language='english'):
+    """Enhanced LLM query with language support"""
+    llm_configs = setup_multilingual_llm()
+    
+    # Create language-specific agricultural prompt
+    if language == 'tamil' or language == 'tanglish':
+        expert_prompt = f"""
+        நீங்கள் ஒரு அனுபவமிக்க விவசாய ஆலோசகர். தமிழ் விவசாயிகளுக்கு உதவுங்கள்.
+        
+        விவசாயியின் கேள்வி: {prompt}
+        
+        கீழ்கண்ட விஷயங்களில் கவனம் செலுத்துங்கள்:
+        1. நேரடியான பதில்
+        2. பாதுகாப்பு வழிமுறைகள்
+        3. குறைந்த செலவில் தீர்வுகள்
+        4. தமிழ்நாட்டு விவசாய முறைகள்
+        
+        You are an expert agricultural advisor helping Tamil farmers.
+        Farmer's Question: {prompt}
+        
+        Provide helpful advice focusing on:
+        1. Direct answer
+        2. Safety measures  
+        3. Cost-effective solutions
+        4. Tamil Nadu farming practices
+        
+        Respond in Tamil and English (Tanglish) as appropriate.
+        """
+    else:
+        expert_prompt = f"""
+        You are an expert agricultural consultant helping Indian farmers.
+        Farmer's Question: {prompt}
+        
+        Provide helpful, practical advice focusing on:
+        1. Direct answer to their question
+        2. Safety considerations
+        3. Cost-effective alternatives
+        4. Prevention tips for Indian farming conditions
+        
+        Keep response concise and actionable (max 200 words).
+        """
+    
+    # Select appropriate LLM configuration
+    config = llm_configs.get(language, llm_configs['english'])
+    
+    payload = {
+        "model": config['model'],
+        "prompt": expert_prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0.7,
+            "max_tokens": 250
+        }
+    }
+    
+    try:
+        response = requests.post(config['url'], json=payload, timeout=100)
+        if response.status_code == 200:
+            return response.json().get("response", "Unable to generate response")
+    except Exception as e:
+        return f"Error: {str(e)}"
+    
+    return "Service temporarily unavailable"
+
+
+
+def setup_tts():
+    """Initialize TTS engines"""
+    engine = pyttsx3.init()
+    
+    # Configure for better voice quality
+    voices = engine.getProperty('voices')
+    engine.setProperty('rate', 150)  # Speed
+    engine.setProperty('volume', 0.8)  # Volume
+    
+    return engine
+
+@contextmanager
+def temporary_audio_file(suffix='.mp3'):
+    """Context manager for automatic cleanup"""
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    temp_file.close()
+    try:
+        yield temp_file.name
+    finally:
+        try:
+            os.unlink(temp_file.name)
+        except OSError:
+            pass
+
+def text_to_speech(text, language='en'):
+    """Convert text to speech with automatic cleanup"""
+    try:
+        if language in ['tamil', 'tanglish']:
+            # Tamil TTS using gTTS
+            tts = gTTS(text=text, lang='ta', slow=False)
+            final_path = f"temp_tts_{uuid.uuid4().hex}.mp3"
+            tts.save(final_path)
+            return final_path
+        else:
+            # ✅ English TTS using pyttsx3
+            engine = setup_tts()
+            final_path = f"temp_tts_{uuid.uuid4().hex}.wav"
+            engine.save_to_file(text, final_path)
+            engine.runAndWait()
+            return final_path
+    except Exception as e:
+        print(f"TTS Error: {e}")
+        return None
+
+
+def play_audio_response(audio_file):
+    """Play generated audio response"""
+    try:
+        pygame.mixer.init()
+        pygame.mixer.music.load(audio_file)
+        pygame.mixer.music.play()
+        
+        # Wait for playback to complete
+        while pygame.mixer.music.get_busy():
+            pygame.time.wait(100)
+            
+        # Cleanup
+        os.unlink(audio_file)
+        
+    except Exception as e:
+        print(f"Audio playback error: {e}")
+
+
+@app.route('/voice-assistant')
+def voice_assistant():
+    return render_template('voice_assistant.html')
+
+@app.route('/voice-query', methods=['POST'])
+def voice_query():
+    """Handle voice-based agricultural queries with improved error handling"""
+    temp_audio_path = None
+    
+    try:
+        # Validate request
+        if 'audio' not in request.files:
+            return jsonify({'error': 'No audio file provided'}), 400
+        
+        audio_file = request.files['audio']
+        if audio_file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Save with proper validation
+        temp_audio_path = f"temp_audio_{uuid.uuid4().hex}.webm"  # ✅ Changed to webm
+        audio_file.save(temp_audio_path)
+        
+        # ✅ Add debugging information
+        file_size = os.path.getsize(temp_audio_path)
+        print(f"📁 Audio file size: {file_size} bytes")
+        
+        if file_size == 0:
+            return jsonify({'error': 'Empty audio file received'}), 400
+        
+        if file_size > 10 * 1024 * 1024:  # 10MB limit
+            return jsonify({'error': 'Audio file too large'}), 400
+        
+        # Transcribe audio
+        transcription = transcribe_audio(temp_audio_path)
+        if not transcription:
+            return jsonify({'error': 'Failed to transcribe audio - check server logs'}), 400
+        
+        print(f"✅ Transcription: {transcription['text']}")
+        
+        # Detect language and get response
+        detected_lang = detect_language(transcription['text'])
+        response_text = query_multilingual_llm(transcription['text'], detected_lang)
+        
+        # Generate audio response
+        audio_response_path = text_to_speech(response_text, detected_lang)
+        
+        return jsonify({
+            'transcription': transcription['text'],
+            'language': detected_lang,
+            'response': response_text,
+            'audio_url': f"/audio/{os.path.basename(audio_response_path)}" if audio_response_path else None,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"❌ Voice processing error: {e}")
+        return jsonify({'error': f'Voice processing error: {str(e)}'}), 500
+    
+    finally:
+        # Cleanup uploaded file
+        if temp_audio_path and os.path.exists(temp_audio_path):
+            os.unlink(temp_audio_path)
+
+
+
+@app.route('/audio/<filename>')
+def serve_audio(filename):
+    """Serve generated audio files"""
+    import os
+    # Ensure the file exists and serve from correct location
+    file_path = os.path.join(tempfile.gettempdir(), filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=False, mimetype='audio/mpeg')
+    else:
+        return jsonify({'error': 'Audio file not found'}), 404
+    
+
+@app.route('/test-transcription')
+def test_transcription():
+    """Test transcription with a simple audio file"""
+    try:
+        # Create a simple test audio file
+        import numpy as np
+        import soundfile as sf
+        
+        # Generate a 2-second sine wave (like a beep)
+        duration = 2  # seconds
+        sample_rate = 16000
+        frequency = 440  # A4 note
+        
+        t = np.linspace(0, duration, duration * sample_rate, False)
+        wave = 0.3 * np.sin(2 * np.pi * frequency * t)
+        
+        test_file = "test_audio_beep.wav"
+        sf.write(test_file, wave, sample_rate)
+        
+        # Test transcription
+        result = whisper_asr(test_file)
+        os.unlink(test_file)  # Cleanup
+        
+        return jsonify({
+            'status': 'Whisper test completed',
+            'result': result,
+            'text_found': bool(result and result.get('text', '').strip())
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'Whisper test failed',
+            'error': str(e)
+        })
+
+
+
+
+#----------------------------------------------new-----------------------------------------------------
+
 
 @app.route('/')
 def landing():

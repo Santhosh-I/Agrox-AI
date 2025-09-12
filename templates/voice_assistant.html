@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Assistant - AGROX AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="voice-assistant-section">
+        <div class="assistant-header">
+            <h2>🎤 AI Voice Assistant</h2>
+            <p>Ask questions in <strong>Tamil (தமிழ்)</strong> or <strong>English</strong></p>
+        </div>
+
+        <div class="voice-interface">
+            <!-- Recording Controls -->
+            <div class="recording-controls">
+                <button id="recordBtn" class="btn btn-primary voice-btn" onclick="toggleRecording()">
+                    <span id="recordIcon">🎤</span>
+                    <span id="recordText">Start Recording</span>
+                </button>
+                <div id="recordingStatus" class="recording-status"></div>
+            </div>
+
+            <!-- Conversation History -->
+            <div class="conversation-history">
+                <div id="conversationList" class="conversation-list">
+                    <div class="welcome-message">
+                        <p>🌾 Welcome to AGROX AI Voice Assistant!</p>
+                        <p>விவசாய கேள்விகளை கேளுங்கள் / Ask your farming questions</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Suggestions -->
+            <div class="quick-suggestions">
+                <h4>Quick Questions:</h4>
+                <div class="suggestion-buttons">
+                    <button class="suggestion-btn" onclick="askSuggestion('What fertilizer is best for tomatoes?')">
+                        🍅 Best fertilizer for tomatoes?
+                    </button>
+                    <button class="suggestion-btn" onclick="askSuggestion('தக்காளி பயிருக்கு எந்த பூச்சிக்கொல்லி சிறந்தது?')">
+                        🌱 தக்காளி பூச்சிக்கொல்லி?
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let isRecording = false;
+let mediaRecorder;
+let audioChunks = [];
+
+async function toggleRecording() {
+    if (!isRecording) {
+        await startRecording();
+    } else {
+        stopRecording();
+    }
+}
+
+async function startRecording() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            sendAudioToServer(audioBlob);
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        updateRecordingUI(true);
+
+    } catch (error) {
+        alert('Microphone access denied. Please enable microphone permissions.');
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        updateRecordingUI(false);
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
+}
+
+function updateRecordingUI(recording) {
+    const btn = document.getElementById('recordBtn');
+    const icon = document.getElementById('recordIcon');
+    const text = document.getElementById('recordText');
+    const status = document.getElementById('recordingStatus');
+
+    if (recording) {
+        btn.className = 'btn btn-danger voice-btn recording';
+        icon.textContent = '⏹️';
+        text.textContent = 'Stop Recording';
+        status.innerHTML = '<div class="recording-pulse">🔴 Recording...</div>';
+    } else {
+        btn.className = 'btn btn-primary voice-btn';
+        icon.textContent = '🎤';
+        text.textContent = 'Start Recording';
+        status.innerHTML = '<div class="processing">⏳ Processing...</div>';
+    }
+}
+
+async function sendAudioToServer(audioBlob) {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.wav');
+
+    try {
+        const response = await fetch('/voice-query', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+        
+        if (result.error) {
+            addConversationMessage('error', result.error);
+        } else {
+            addConversationMessage('user', result.transcription, result.language);
+            addConversationMessage('assistant', result.response);
+            
+            // Play audio response
+            if (result.audio_url) {
+                playAudioResponse(result.audio_url);
+            }
+        }
+    } catch (error) {
+        addConversationMessage('error', 'Failed to process audio. Please try again.');
+    }
+    
+    document.getElementById('recordingStatus').innerHTML = '';
+}
+
+function addConversationMessage(type, message, language = '') {
+    const conversationList = document.getElementById('conversationList');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `conversation-message ${type}`;
+    
+    let icon = type === 'user' ? '👤' : type === 'assistant' ? '🤖' : '⚠️';
+    let langBadge = language ? `<span class="lang-badge">${language}</span>` : '';
+    
+    messageDiv.innerHTML = `
+        <div class="message-header">
+            ${icon} ${type === 'user' ? 'You' : 'AGROX AI'} ${langBadge}
+        </div>
+        <div class="message-content">${message}</div>
+        <div class="message-time">${new Date().toLocaleTimeString()}</div>
+    `;
+    
+    conversationList.appendChild(messageDiv);
+    conversationList.scrollTop = conversationList.scrollHeight;
+}
+
+function playAudioResponse(audioUrl) {
+    const audio = new Audio(audioUrl);
+    audio.play();
+}
+
+function askSuggestion(question) {
+    addConversationMessage('user', question);
+    
+    fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: question, context: {} })
+    })
+    .then(response => response.json())
+    .then(result => {
+        addConversationMessage('assistant', result.response);
+    });
+}
+</script>
+{% endblock %}
