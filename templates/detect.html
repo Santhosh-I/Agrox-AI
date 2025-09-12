@@ -9,6 +9,11 @@
         <div class="results-header">
             <h2>🔬 Disease Analysis Complete</h2>
             <p class="results-timestamp">Analyzed on {{ result.timestamp }}</p>
+            {% if result.llm_available %}
+                <span class="ai-status active">🤖 AI Assistant Available</span>
+            {% else %}
+                <span class="ai-status inactive">🤖 AI Assistant Offline</span>
+            {% endif %}
         </div>
 
         <!-- Results Content -->
@@ -34,8 +39,7 @@
                         <div class="disease-name">{{ result.disease_name }}</div>
                         <div class="confidence-info">
                             <div class="confidence-bar">
-                                    <div class="confidence-fill" style="--confidence: {{ result.confidence }};"></div>
-
+                                <div class="confidence-fill" style="width: {{ result.confidence }}%"></div>
                             </div>
                             <span class="confidence-text">{{ result.confidence }}% Accuracy</span>
                         </div>
@@ -66,6 +70,34 @@
                     </div>
                 </div>
 
+                <!-- Step-by-Step Instructions Card -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>📋 Step-by-Step Instructions</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="steps-container">
+                            {% for step in result.steps %}
+                            <div class="step-item" style="--step-index: {{ loop.index }}">
+                                <div class="step-number">{{ loop.index }}</div>
+                                <div class="step-text">{{ step }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="timing-safety">
+                            <div class="timing-info">
+                                <strong>⏰ Best Timing:</strong>
+                                <p>{{ result.timing }}</p>
+                            </div>
+                            <div class="safety-info">
+                                <strong>🛡️ Safety Precautions:</strong>
+                                <p>{{ result.safety }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Prevention Card -->
                 <div class="result-card">
                     <div class="card-header">
@@ -75,13 +107,69 @@
                         <p class="prevention-text">{{ result.prevention }}</p>
                     </div>
                 </div>
+
+                <!-- YouTube Videos Card -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>📺 Video Tutorials</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="video-grid">
+                            {% for video in result.youtube_videos %}
+                            <div class="video-card">
+                                <a href="{{ video.url }}" target="_blank" class="video-link">
+                                    <div class="video-icon">📹</div>
+                                    <h4>{{ video.title }}</h4>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Chat Assistant Card -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3>🤖 Ask AI Assistant</h3>
+                        {% if not result.llm_available %}
+                            <span class="offline-note">Offline - Database recommendations only</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-content">
+                        <div class="chat-container">
+                            <div id="chatHistory" class="chat-history"></div>
+                            <div class="chat-input-container">
+                                <input type="text" 
+                                       id="chatInput" 
+                                       placeholder="{% if result.llm_available %}Ask about this disease...{% else %}AI Assistant offline - use standard recommendations{% endif %}"
+                                       class="chat-input"
+                                       {% if not result.llm_available %}disabled{% endif %}>
+                                <button onclick="askAI()" 
+                                        class="btn btn-primary chat-btn"
+                                        {% if not result.llm_available %}disabled{% endif %}>
+                                    {% if result.llm_available %}Ask AI{% else %}Offline{% endif %}
+                                </button>
+                            </div>
+                            <div class="chat-suggestions">
+                                {% if result.llm_available %}
+                                <p><strong>Try asking:</strong></p>
+                                <div class="suggestion-tags">
+                                    <span class="suggestion-tag" onclick="askSuggestion('What if it rains after spraying?')">🌧️ What if it rains?</span>
+                                    <span class="suggestion-tag" onclick="askSuggestion('I have a small budget, cheapest option?')">💰 Budget option?</span>
+                                    <span class="suggestion-tag" onclick="askSuggestion('Treatment didn't work, what next?')">🔄 What if no improvement?</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="action-buttons">
             <button class="btn btn-secondary" onclick="speakResults()" id="speakBtn">
-                🔊 Play Audio
+                🔊 Play Audio Guide
             </button>
             <button class="btn btn-outline" onclick="downloadReport()">
                 📄 Download Report
@@ -94,7 +182,7 @@
 </div>
 
 <script>
-// Enhanced result data for audio and download features
+// Enhanced result data
 const resultData = {
     disease: "{{ result.disease_name }}",
     confidence: "{{ result.confidence }}",
@@ -102,7 +190,11 @@ const resultData = {
     prevention: "{{ result.prevention }}",
     pesticide: "{{ result.pesticide }}",
     dosage: "{{ result.dosage }}",
-    cost: "{{ result.cost }}"
+    cost: "{{ result.cost }}",
+    steps: {{ result.steps|tojson }},
+    timing: "{{ result.timing }}",
+    safety: "{{ result.safety }}",
+    llm_available: {{ result.llm_available|tojson }}
 };
 </script>
 {% endblock %}

@@ -1,15 +1,269 @@
-// AGROX AI Frontend JavaScript
+// Enhanced AGROX AI JavaScript with Chat Integration
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
+    animateSteps();
 });
 
 function initializeApp() {
     setupFileUpload();
-    setupFormSubmission();
-    setupAudioFeatures();
+    setupChatBot();
+    setupVoiceAssistant();
+    setupNavigation();
 }
 
-// File Upload Functionality
+// Chat functionality
+function askAI() {
+    const chatInput = document.getElementById('chatInput');
+    const question = chatInput.value.trim();
+    
+    if (!question) {
+        showAlert('Please enter a question', 'error');
+        return;
+    }
+    
+    if (!resultData.llm_available) {
+        showAlert('AI Assistant is offline', 'error');
+        return;
+    }
+    
+    // Add user message to chat
+    addChatMessage('user', question);
+    chatInput.value = '';
+    
+    // Show typing indicator
+    const typingId = addChatMessage('ai', 'Thinking...', true);
+    
+    // Send to AI
+    fetch('/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            question: question,
+            context: {
+                disease_name: resultData.disease,
+                treatment: resultData.treatment,
+                pesticide: resultData.pesticide,
+                cost: resultData.cost
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Remove typing indicator
+        removeTypingMessage(typingId);
+        
+        if (data.error) {
+            addChatMessage('ai', `Sorry, there was an error: ${data.error}`);
+        } else {
+            addChatMessage('ai', data.response);
+        }
+    })
+    .catch(error => {
+        removeTypingMessage(typingId);
+        addChatMessage('ai', 'Sorry, I could not process your request. Please try again.');
+        console.error('Chat error:', error);
+    });
+}
+
+function askSuggestion(question) {
+    document.getElementById('chatInput').value = question;
+    askAI();
+}
+
+function addChatMessage(sender, message, isTyping = false) {
+    const chatHistory = document.getElementById('chatHistory');
+    const messageDiv = document.createElement('div');
+    const messageId = 'msg-' + Date.now();
+    
+    messageDiv.id = messageId;
+    messageDiv.className = `chat-message ${sender}${isTyping ? ' typing' : ''}`;
+    
+    const icon = sender === 'user' ? '👤' : '🤖';
+    const name = sender === 'user' ? 'You' : 'AI Assistant';
+    
+    messageDiv.innerHTML = `
+        <div class="message-header">
+            <span class="message-icon">${icon}</span>
+            <strong class="message-sender">${name}</strong>
+            <span class="message-time">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="message-content">
+            ${isTyping ? '<div class="typing-dots"><span></span><span></span><span></span></div>' : message}
+        </div>
+    `;
+    
+    chatHistory.appendChild(messageDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    
+    return messageId;
+}
+
+function removeTypingMessage(messageId) {
+    const message = document.getElementById(messageId);
+    if (message) {
+        message.remove();
+    }
+}
+
+// Enhanced text-to-speech with steps
+function speakResults() {
+    if ('speechSynthesis' in window && typeof resultData !== 'undefined') {
+        const speakBtn = document.getElementById('speakBtn');
+        
+        speakBtn.disabled = true;
+        speakBtn.innerHTML = '🔇 Speaking...';
+        
+        let audioText = `Disease Analysis Complete. 
+                        Detected condition: ${resultData.disease}. 
+                        Confidence level: ${resultData.confidence} percent. 
+                        
+                        Treatment recommendation: ${resultData.treatment}. 
+                        Recommended pesticide: ${resultData.pesticide}. 
+                        Dosage: ${resultData.dosage}. 
+                        Estimated cost: ${resultData.cost}.
+                        
+                        Step by step instructions: `;
+        
+        // Add steps
+        if (resultData.steps) {
+            resultData.steps.forEach((step, index) => {
+                audioText += `Step ${index + 1}: ${step}. `;
+            });
+        }
+        
+        audioText += `Best timing: ${resultData.timing}. 
+                     Safety precautions: ${resultData.safety}. 
+                     Prevention measures: ${resultData.prevention}.`;
+        
+        const utterance = new SpeechSynthesisUtterance(audioText);
+        utterance.rate = 0.8;
+        utterance.pitch = 1;
+        
+        utterance.onend = function() {
+            speakBtn.disabled = false;
+            speakBtn.innerHTML = '🔊 Play Audio Guide';
+        };
+        
+        utterance.onerror = function() {
+            speakBtn.disabled = false;
+            speakBtn.innerHTML = '🔊 Play Audio Guide';
+            showAlert('Audio playback failed', 'error');
+        };
+        
+        speechSynthesis.speak(utterance);
+    } else {
+        showAlert('Text-to-speech not supported in this browser', 'error');
+    }
+}
+
+// Enhanced download report
+function downloadReport() {
+    if (typeof resultData !== 'undefined') {
+        const reportContent = generateDetailedReport();
+        const blob = new Blob([reportContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `agrox-ai-detailed-report-${new Date().toISOString().slice(0, 10)}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        showAlert('Detailed report downloaded successfully', 'success');
+    }
+}
+
+function generateDetailedReport() {
+    let stepsText = '';
+    if (resultData.steps) {
+        resultData.steps.forEach((step, index) => {
+            stepsText += `${index + 1}. ${step}\n`;
+        });
+    }
+
+    return `
+AGROX AI - COMPREHENSIVE PLANT DISEASE DETECTION REPORT
+======================================================
+
+Generated: ${new Date().toLocaleString()}
+Analysis Model: Advanced AI Disease Detection System
+AI Assistant: ${resultData.llm_available ? 'Available' : 'Offline'}
+
+DISEASE ANALYSIS RESULTS
+========================
+Detected Disease: ${resultData.disease}
+Confidence Level: ${resultData.confidence}%
+Analysis Accuracy: High Confidence Detection
+
+TREATMENT RECOMMENDATIONS
+=========================
+Primary Treatment: ${resultData.treatment}
+Recommended Pesticide: ${resultData.pesticide}
+Precise Dosage: ${resultData.dosage}
+Estimated Treatment Cost: ${resultData.cost}
+
+STEP-BY-STEP APPLICATION INSTRUCTIONS
+=====================================
+${stepsText}
+
+TIMING & SAFETY GUIDELINES
+==========================
+Optimal Application Timing:
+${resultData.timing}
+
+Essential Safety Precautions:
+${resultData.safety}
+
+PREVENTION STRATEGIES
+====================
+${resultData.prevention}
+
+ADDITIONAL RESOURCES
+===================
+For video tutorials and detailed guidance:
+- Search YouTube for disease-specific treatments
+- Visit agricultural extension services
+- Consult with local plant pathology experts
+
+DISCLAIMER & EXPERT CONSULTATION
+================================
+This AI analysis provides preliminary diagnosis and treatment suggestions.
+For critical decisions or persistent problems, please consult:
+- Local agricultural extension officers
+- Plant pathology specialists
+- Certified crop advisors
+
+The accuracy of this analysis is ${resultData.confidence}%. Always verify
+with multiple sources before applying treatments to valuable crops.
+
+ABOUT AGROX AI
+==============
+AGROX AI is an advanced agricultural intelligence platform that combines
+machine learning, IoT monitoring, and expert knowledge to support farmers
+in making informed crop management decisions.
+
+For more information: Visit our platform
+Contact: Agricultural Support Team
+
+Report ID: ${Math.random().toString(36).substr(2, 9).toUpperCase()}
+    `.trim();
+}
+
+// Animate step items
+function animateSteps() {
+    const stepItems = document.querySelectorAll('.step-item');
+    stepItems.forEach((item, index) => {
+        item.style.setProperty('--step-index', index);
+        item.style.animationDelay = `${index * 0.1}s`;
+    });
+}
+
+// File upload functionality
 function setupFileUpload() {
     const fileInput = document.getElementById('imageInput');
     const filePreview = document.getElementById('filePreview');
@@ -49,141 +303,11 @@ function validateFileSize(file) {
     }
 }
 
-// Form Submission with Loading State
-function setupFormSubmission() {
-    const form = document.getElementById('uploadForm');
-    const submitBtn = document.getElementById('analyzeBtn');
-    
-    if (form && submitBtn) {
-        form.addEventListener('submit', function(e) {
-            const fileInput = document.getElementById('imageInput');
-            if (!fileInput.files.length) {
-                e.preventDefault();
-                showAlert('Please select an image file', 'error');
-                return;
-            }
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.classList.add('form-loading');
-            document.body.style.cursor = 'wait';
-        });
-    }
-}
-
-// Audio Features for Results Page
-function setupAudioFeatures() {
-    // Text-to-Speech functionality will be set up here
-    if (typeof resultData !== 'undefined') {
-        setupResultsPage();
-    }
-}
-
-function setupResultsPage() {
-    // Animate confidence bar
-    const confidenceFill = document.querySelector('.confidence-fill');
-    if (confidenceFill) {
-        setTimeout(() => {
-            confidenceFill.style.width = resultData.confidence + '%';
-        }, 500);
-    }
-}
-
-// Enhanced Text-to-Speech Function
-function speakResults() {
-    if ('speechSynthesis' in window && typeof resultData !== 'undefined') {
-        const speakBtn = document.getElementById('speakBtn');
-        
-        speakBtn.disabled = true;
-        speakBtn.innerHTML = '🔇 Speaking...';
-        
-        const text = `Disease Analysis Complete. 
-                     Detected condition: ${resultData.disease}. 
-                     Confidence level: ${resultData.confidence} percent. 
-                     Recommended treatment: ${resultData.treatment}. 
-                     Recommended pesticide: ${resultData.pesticide}. 
-                     Dosage: ${resultData.dosage}. 
-                     Estimated cost: ${resultData.cost}.
-                     Prevention: ${resultData.prevention}`;
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.8;
-        utterance.pitch = 1;
-        
-        utterance.onend = function() {
-            speakBtn.disabled = false;
-            speakBtn.innerHTML = '🔊 Play Audio';
-        };
-        
-        speechSynthesis.speak(utterance);
-    } else {
-        showAlert('Text-to-speech not supported in this browser', 'error');
-    }
-}
-
-// Download Report Function
-function downloadReport() {
-    if (typeof resultData !== 'undefined') {
-        const reportContent = generateReportContent();
-        const blob = new Blob([reportContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `agrox-ai-report-${new Date().toISOString().slice(0, 10)}.txt`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        showAlert('Report downloaded successfully', 'success');
-    }
-}
-
-function generateReportContent() {
-    return `
-AGROX AI - PLANT DISEASE DETECTION REPORT
-==========================================
-
-Generated: ${new Date().toLocaleString()}
-
-ANALYSIS RESULTS
-----------------
-Disease Detected: ${resultData.disease}
-Confidence Level: ${resultData.confidence}%
-
-RECOMMENDED TREATMENT
----------------------
-${resultData.treatment}
-
-PREVENTION MEASURES
--------------------
-${resultData.prevention}
-
-COST ESTIMATE
--------------
-${resultData.cost}
-
-DISCLAIMER
-----------
-This analysis is based on AI image recognition and should be used
-as a reference only. For critical decisions, please consult with
-agricultural experts or extension services.
-
-Generated by AGROX AI
-Smart Agricultural Solutions
-Visit: [Your Website URL]
-Contact: [Your Contact Information]
-    `.trim();
-}
-
-// Alert System
+// Alert system
 function showAlert(message, type = 'info') {
-    // Remove existing alerts
     const existingAlerts = document.querySelectorAll('.flash-message');
     existingAlerts.forEach(alert => alert.remove());
     
-    // Create new alert
     const alertDiv = document.createElement('div');
     alertDiv.className = `flash-message flash-${type}`;
     alertDiv.innerHTML = `
@@ -192,12 +316,10 @@ function showAlert(message, type = 'info') {
         <button class="flash-close" onclick="this.parentElement.style.display='none'">&times;</button>
     `;
     
-    // Insert alert
     const container = document.querySelector('.container');
     if (container) {
         container.insertBefore(alertDiv, container.firstChild);
         
-        // Auto-remove after 5 seconds
         setTimeout(() => {
             if (alertDiv.parentNode) {
                 alertDiv.style.opacity = '0';
@@ -207,39 +329,25 @@ function showAlert(message, type = 'info') {
     }
 }
 
-// Utility Functions
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+// Navigation setup
+function setupNavigation() {
+    // Add any navigation-specific functionality here
 }
 
-// Service Worker Registration (for PWA functionality)
-// if ('serviceWorker' in navigator) {
-//     window.addEventListener('load', function() {
-//         navigator.serviceWorker.register('/static/sw.js')
-//             .then(function(registration) {
-//                 console.log('✅ ServiceWorker registered successfully');
-//             })
-//             .catch(function(err) {
-//                 console.log('❌ ServiceWorker registration failed: ', err);
-//             });
-//     });
-// }
+// Voice assistant setup
+function setupVoiceAssistant() {
+    // Add voice assistant functionality here if needed
+}
 
-// Global error handling
-window.addEventListener('error', function(e) {
-    console.error('Application error:', e.error);
-    showAlert('An unexpected error occurred. Please refresh the page.', 'error');
-});
-
-// Network status monitoring
-window.addEventListener('online', function() {
-    showAlert('Connection restored', 'success');
-});
-
-window.addEventListener('offline', function() {
-    showAlert('Connection lost - some features may be limited', 'error');
+// Initialize chat input events
+document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askAI();
+            }
+        });
+    }
 });
