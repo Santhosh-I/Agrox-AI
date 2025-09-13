@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}IoT Dashboard - AGROX AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="dashboard-header">
+        <h2>🌾 AGROX AI IoT Dashboard</h2>
+        <p>Real-time Agricultural & Aquafarm Monitoring</p>
+        <div class="status-indicators">
+            <span class="status-badge online">🟢 6 Sensors Online</span>
+            <span class="status-badge">📡 Last Update: <span id="lastUpdate">--</span></span>
+            <span class="status-badge">🔄 Auto-refresh: ON</span>
+        </div>
+    </div>
+
+    <!-- Soil Health Sensors Section -->
+    <div class="dashboard-section">
+        <h3>🌱 Soil Health Sensors</h3>
+        <p class="section-description">Monitoring key soil parameters for optimal crop growth</p>
+        
+        <div class="sensor-grid">
+            <div class="sensor-card" id="soil-moisture-card">
+                <div class="sensor-header">
+                    <h4>💧 Soil Moisture Sensor</h4>
+                    <span class="sensor-status online">●</span>
+                </div>
+                <div class="sensor-value">
+                    <span id="soil-moisture-value">--</span><span class="unit">%</span>
+                </div>
+                <div class="sensor-description">Detects wet or dry soil conditions</div>
+                <div class="sensor-details">
+                    <span class="detail-item">📊 Range: 0-100%</span>
+                    <span class="detail-item">⚡ Updated: <span id="soil-moisture-time">--</span></span>
+                </div>
+                <div class="sensor-chart">
+                    <canvas id="soilMoistureChart" width="250" height="80"></canvas>
+                </div>
+            </div>
+
+            <div class="sensor-card" id="soil-ph-card">
+                <div class="sensor-header">
+                    <h4>⚖️ Soil pH Sensor</h4>
+                    <span class="sensor-status online">●</span>
+                </div>
+                <div class="sensor-value">
+                    <span id="soil-ph-value">--</span><span class="unit">pH</span>
+                </div>
+                <div class="sensor-description">Measures soil acidity or alkalinity</div>
+                <div class="sensor-details">
+                    <span class="detail-item">📊 Range: 4.0-8.5</span>
+                    <span class="detail-item">⚡ Updated: <span id="soil-ph-time">--</span></span>
+                </div>
+                <div class="sensor-chart">
+                    <canvas id="soilPhChart" width="250" height="80"></canvas>
+                </div>
+            </div>
+
+            <div class="sensor-card" id="soil-temperature-card">
+                <div class="sensor-header">
+                    <h4>🌡️ Temperature Sensor (DHT11/DS18B20)</h4>
+                    <span class="sensor-status online">●</span>
+                </div>
+                <div class="sensor-value">
+                    <span id="soil-temperature-value">--</span><span class="unit">°C</span>
+                </div>
+                <div class="sensor-description">Measures soil temperature</div>
+                <div class="sensor-details">
+                    <span class="detail-item">📊 Range: 10-40°C</span>
+                    <span class="detail-item">⚡ Updated: <span id="soil-temperature-time">--</span></span>
+                </div>
+                <div class="sensor-chart">
+                    <canvas id="soilTemperatureChart" width="250" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aquafarm Water Quality Sensors Section -->
+    <div class="dashboard-section">
+        <h3>🐟 Aquafarm Water Quality Sensors</h3>
+        <p class="section-description">Monitoring water quality parameters for healthy aquaculture</p>
+        
+        <div class="sensor-grid">
+            <div class="sensor-card" id="water-ph-card">
+                <div class="sensor-header">
+                    <h4>💧 Water pH Sensor</h4>
+                    <span class="sensor-status online">●</span>
+                </div>
+                <div class="sensor-value">
+                    <span id="water-ph-value">--</span><span class="unit">pH</span>
+                </div>
+                <div class="sensor-description">Checks water acidity levels</div>
+                <div class="sensor-details">
+                    <span class="detail-item">📊 Range: 6.0-8.5</span>
+                    <span class="detail-item">⚡ Updated: <span id="water-ph-time">--</span></span>
+                </div>
+                <div class="sensor-chart">
+                    <canvas id="waterPhChart" width="250" height="80"></canvas>
+                </div>
+            </div>
+
+            <div class="sensor-card" id="turbidity-card">
+                <div class="sensor-header">
+                    <h4>🔍 Turbidity Sensor</h4>
+                    <span class="sensor-status online">●</span>
+                </div>
+                <div class="sensor-value">
+                    <span id="turbidity-value">--</span><span class="unit">NTU</span>
+                </div>
+                <div class="sensor-description">Measures water clarity (for contamination)</div>
+                <div class="sensor-details">
+                    <span class="detail-item">📊 Range: 0-10 NTU</span>
+                    <span class="detail-item">⚡ Updated: <span id="turbidity-time">--</span></span>
+                </div>
+                <div class="sensor-chart">
+                    <canvas id="turbidityChart" width="250" height="80"></canvas>
+                </div>
+            </div>
+
+            <div class="sensor-card" id="salinity-card">
+                <div class="sensor-header">
+                    <h4>🧂 Salinity Sensor (EC Sensor)</h4>
+                    <span class="sensor-status online">●</span>
+                </div>
+                <div class="sensor-value">
+                    <span id="salinity-value">--</span><span class="unit">mS/cm</span>
+                </div>
+                <div class="sensor-description">Measures salt content in water</div>
+                <div class="sensor-details">
+                    <span class="detail-item">📊 Range: 0.5-2.5 mS/cm</span>
+                    <span class="detail-item">⚡ Updated: <span id="salinity-time">--</span></span>
+                </div>
+                <div class="sensor-chart">
+                    <canvas id="salinityChart" width="250" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status and Alerts -->
+    <div class="dashboard-section">
+        <h3>⚠️ System Status & Alerts</h3>
+        <div class="alerts-container" id="alertsContainer">
+            <div class="alert-item info">
+                <span class="alert-icon">✅</span>
+                <div class="alert-content">
+                    <strong>System Online:</strong> All sensors are reporting data successfully
+                    <small class="alert-time">Just now</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sensor data storage for charts
+const sensorHistoryData = {
+    soilMoisture: [],
+    soilPh: [],
+    soilTemperature: [],
+    waterPh: [],
+    turbidity: [],
+    salinity: []
+};
+
+// Sensor configurations
+const sensorConfigs = {
+    soil_moisture: {
+        element: 'soil-moisture',
+        chart: 'soilMoistureChart',
+        optimal: { min: 40, max: 70 },
+        acceptable: { min: 25, max: 85 }
+    },
+    soil_ph: {
+        element: 'soil-ph',
+        chart: 'soilPhChart',
+        optimal: { min: 6.0, max: 7.5 },
+        acceptable: { min: 5.5, max: 8.0 }
+    },
+    soil_temperature: {
+        element: 'soil-temperature',
+        chart: 'soilTemperatureChart',
+        optimal: { min: 18, max: 28 },
+        acceptable: { min: 10, max: 35 }
+    },
+    water_ph: {
+        element: 'water-ph',
+        chart: 'waterPhChart',
+        optimal: { min: 6.8, max: 7.6 },
+        acceptable: { min: 6.2, max: 8.0 }
+    },
+    turbidity: {
+        element: 'turbidity',
+        chart: 'turbidityChart',
+        optimal: { min: 0, max: 2 },
+        acceptable: { min: 0, max: 5 }
+    },
+    salinity_ec: {
+        element: 'salinity',
+        chart: 'salinityChart',
+        optimal: { min: 0.8, max: 1.5 },
+        acceptable: { min: 0.5, max: 2.0 }
+    }
+};
+
+// Update sensor display
+function updateSensorDisplay(sensorKey, data) {
+    const config = sensorConfigs[sensorKey];
+    if (!config) return;
+    
+    const valueElement = document.getElementById(`${config.element}-value`);
+    const timeElement = document.getElementById(`${config.element}-time`);
+    const cardElement = document.getElementById(`${config.element}-card`);
+    
+    if (valueElement) {
+        valueElement.textContent = data.value;
+    }
+    
+    if (timeElement) {
+        timeElement.textContent = new Date().toLocaleTimeString();
+    }
+    
+    // Update card status based on value
+    if (cardElement) {
+        cardElement.className = 'sensor-card ' + getSensorStatus(sensorKey, data.value);
+    }
+    
+    // Update historical data for charts
+    const historyKey = sensorKey.replace('_', '').replace('ec', '');
+    if (sensorHistoryData[historyKey]) {
+        sensorHistoryData[historyKey].push(data.value);
+        if (sensorHistoryData[historyKey].length > 20) {
+            sensorHistoryData[historyKey].shift();
+        }
+        
+        // Update chart
+        drawMiniChart(config.chart, sensorHistoryData[historyKey]);
+    }
+}
+
+// Get sensor status
+function getSensorStatus(sensorKey, value) {
+    const config = sensorConfigs[sensorKey];
+    if (!config) return 'normal';
+    
+    if (value >= config.optimal.min && value <= config.optimal.max) {
+        return 'optimal';
+    } else if (value >= config.acceptable.min && value <= config.acceptable.max) {
+        return 'normal';
+    } else {
+        return 'warning';
+    }
+}
+
+// Draw mini chart
+function drawMiniChart(canvasId, data, color = '#4CAF50') {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || data.length < 2) return;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const maxVal = Math.max(...data);
+    const minVal = Math.min(...data);
+    const range = maxVal - minVal || 1;
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    data.forEach((value, index) => {
+        const x = (index / (data.length - 1)) * canvas.width;
+        const y = canvas.height - ((value - minVal) / range) * canvas.height;
+        
+        if (index === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    
+    ctx.stroke();
+}
+
+// Fetch sensor data from API
+async function fetchSensorData() {
+    try {
+        const response = await fetch('/api/sensor-data');
+        const data = await response.json();
+        
+        // Update soil health sensors
+        Object.keys(data.soil_health).forEach(sensor => {
+            updateSensorDisplay(sensor, data.soil_health[sensor]);
+        });
+        
+        // Update aquafarm sensors
+        Object.keys(data.aquafarm).forEach(sensor => {
+            updateSensorDisplay(sensor, data.aquafarm[sensor]);
+        });
+        
+        // Update last update time
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        
+        // Generate alerts if needed
+        generateSystemAlerts(data);
+        
+    } catch (error) {
+        console.error('Failed to fetch sensor data:', error);
+        showSystemError('Failed to fetch sensor data');
+    }
+}
+
+// Generate system alerts
+function generateSystemAlerts(data) {
+    const alertsContainer = document.getElementById('alertsContainer');
+    const alerts = [];
+    
+    // Check all sensors for alerts
+    const allSensors = { ...data.soil_health, ...data.aquafarm };
+    
+    Object.keys(allSensors).forEach(sensorKey => {
+        const sensorData = allSensors[sensorKey];
+        const status = getSensorStatus(sensorKey, sensorData.value);
+        
+        if (status === 'warning') {
+            const sensorName = sensorKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+            alerts.push({
+                type: 'warning',
+                icon: '⚠️',
+                message: `${sensorName} is outside optimal range: ${sensorData.value}${sensorData.unit}`,
+                time: 'Just now'
+            });
+        }
+    });
+    
+    // Clear and update alerts
+    alertsContainer.innerHTML = '';
+    
+    if (alerts.length === 0) {
+        alertsContainer.innerHTML = `
+            <div class="alert-item info">
+                <span class="alert-icon">✅</span>
+                <div class="alert-content">
+                    <strong>All Systems Normal:</strong> All sensors are within optimal ranges
+                    <small class="alert-time">Just now</small>
+                </div>
+            </div>
+        `;
+    } else {
+        alerts.forEach(alert => {
+            alertsContainer.innerHTML += `
+                <div class="alert-item ${alert.type}">
+                    <span class="alert-icon">${alert.icon}</span>
+                    <div class="alert-content">
+                        <strong>Alert:</strong> ${alert.message}
+                        <small class="alert-time">${alert.time}</small>
+                    </div>
+                </div>
+            `;
+        });
+    }
+}
+
+// Show system error
+function showSystemError(message) {
+    const alertsContainer = document.getElementById('alertsContainer');
+    alertsContainer.innerHTML = `
+        <div class="alert-item error">
+            <span class="alert-icon">❌</span>
+            <div class="alert-content">
+                <strong>System Error:</strong> ${message}
+                <small class="alert-time">Just now</small>
+            </div>
+        </div>
+    `;
+}
+
+// Initialize dashboard
+function initDashboard() {
+    console.log('🌾 AGROX AI IoT Dashboard initialized');
+    
+    // Initial data fetch
+    fetchSensorData();
+    
+    // Auto-refresh every 5 seconds
+    setInterval(fetchSensorData, 5000);
+}
+
+// Start dashboard when page loads
+document.addEventListener('DOMContentLoaded', initDashboard);
+</script>
+{% endblock %}

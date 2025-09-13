@@ -1521,3 +1521,283 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
+
+
+/* Enhanced IoT Dashboard Styles */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.dashboard-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.2rem;
+}
+
+.dashboard-header p {
+    margin: 0 0 1rem 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.status-indicators {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.status-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.status-badge.online {
+    background: rgba(76, 175, 80, 0.3);
+}
+
+.dashboard-section {
+    margin-bottom: 3rem;
+}
+
+.dashboard-section h3 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid #4CAF50;
+    font-size: 1.5rem;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+.sensor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.sensor-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border-left: 6px solid #4CAF50;
+    position: relative;
+    overflow: hidden;
+}
+
+.sensor-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, rgba(76, 175, 80, 0.1), transparent);
+    border-radius: 0 0 0 100%;
+}
+
+.sensor-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.sensor-card.optimal {
+    border-left-color: #4CAF50;
+}
+
+.sensor-card.normal {
+    border-left-color: #2196F3;
+}
+
+.sensor-card.warning {
+    border-left-color: #ff9800;
+}
+
+.sensor-card.error {
+    border-left-color: #f44336;
+}
+
+.sensor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.sensor-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.sensor-status {
+    font-size: 1.5rem;
+    animation: pulse 2s infinite;
+}
+
+.sensor-status.online {
+    color: #4CAF50;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.sensor-value {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    line-height: 1;
+}
+
+.sensor-value .unit {
+    font-size: 1.5rem;
+    color: #666;
+    margin-left: 0.25rem;
+}
+
+.sensor-description {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.sensor-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-item {
+    color: #888;
+    font-size: 0.85rem;
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+.sensor-chart {
+    height: 80px;
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 0.5rem;
+    background: linear-gradient(to bottom, #fafafa, #f5f5f5);
+    position: relative;
+}
+
+.sensor-chart canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.alerts-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 15px;
+    border-left: 5px solid #ddd;
+    background: #f8f9fa;
+}
+
+.alert-item.info {
+    background: #e3f2fd;
+    border-left-color: #2196F3;
+}
+
+.alert-item.warning {
+    background: #fff3e0;
+    border-left-color: #ff9800;
+}
+
+.alert-item.error {
+    background: #ffebee;
+    border-left-color: #f44336;
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    margin-top: 0.2rem;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-content strong {
+    color: #2c3e50;
+}
+
+.alert-time {
+    display: block;
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sensor-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-indicators {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .sensor-value {
+        font-size: 2.5rem;
+    }
+    
+    .sensor-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .dashboard-header h2 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .sensor-card {
+        padding: 1.5rem;
+    }
+    
+    .sensor-value {
+        font-size: 2rem;
+    }
+}
+

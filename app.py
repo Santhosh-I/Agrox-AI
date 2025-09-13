@@ -1254,6 +1254,67 @@ def health_check():
         'timestamp': datetime.now().isoformat()
     })
 
+#-------------------------------------------------------------------------------------------------------------
+@app.route('/iot-dashboard')
+def iot_dashboard():
+    return render_template('iot_dashboard.html')
+
+# Add API endpoint for real-time sensor data
+@app.route('/api/sensor-data')
+def get_sensor_data():
+    """API endpoint to get current sensor readings"""
+    import random
+    import time
+    
+    # Generate realistic dummy data
+    sensor_data = {
+        'soil_health': {
+            'soil_moisture': {
+                'value': round(35 + random.uniform(-10, 15), 1),
+                'unit': '%',
+                'status': 'normal',
+                'timestamp': int(time.time())
+            },
+            'soil_ph': {
+                'value': round(6.0 + random.uniform(-0.8, 1.5), 1),
+                'unit': '',
+                'status': 'normal',
+                'timestamp': int(time.time())
+            },
+            'soil_temperature': {
+                'value': round(22 + random.uniform(-5, 8), 1),
+                'unit': '°C',
+                'status': 'normal',
+                'timestamp': int(time.time())
+            }
+        },
+        'aquafarm': {
+            'water_ph': {
+                'value': round(7.0 + random.uniform(-0.5, 0.8), 1),
+                'unit': '',
+                'status': 'normal',
+                'timestamp': int(time.time())
+            },
+            'turbidity': {
+                'value': round(2.0 + random.uniform(0, 3.0), 1),
+                'unit': 'NTU',
+                'status': 'normal',
+                'timestamp': int(time.time())
+            },
+            'salinity_ec': {
+                'value': round(1.0 + random.uniform(-0.3, 0.8), 1),
+                'unit': 'mS/cm',
+                'status': 'normal',
+                'timestamp': int(time.time())
+            }
+        }
+    }
+    
+    return jsonify(sensor_data)
+
+
+#-------------------------------------------------------------------------------------------------------------
+
 if __name__ == '__main__':
     print(f"🌱 AGROX AI Starting...")
     print(f"📊 Database: {len(classes)} diseases loaded")
