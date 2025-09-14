@@ -4,44 +4,29 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from werkzeug.utils import secure_filename
-import cv2
 from datetime import datetime
 import sqlite3
-import base64
-from io import BytesIO
-from PIL import Image
+import tensorflow as tf
 
+# ---------------- Flask Setup ----------------
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Create upload directory if it doesn't exist
+# Ensure upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Load ML model with error handling and version compatibility
+# ---------------- Load Model ----------------
 print("Loading AI model...")
 try:
-    # Try loading with compile=False first
-    model = load_model('model/plant_disease_model.h5', compile=False)
+    model = load_model("model/plant_disease_model.h5")
     print("✅ Model loaded successfully!")
 except Exception as e:
-    print(f"❌ Error loading model with compile=False: {e}")
-    try:
-        # Try with custom objects for compatibility
-        import tensorflow as tf
-        model = tf.keras.models.load_model(
-            'model/plant_disease_model.h5',
-            custom_objects=None,
-            compile=False
-        )
-        print("✅ Model loaded successfully with custom_objects!")
-    except Exception as e2:
-        print(f"❌ Error loading model with custom_objects: {e2}")
-        model = None
+    print(f"❌ Failed to load model: {e}")
+    model = None
 
-
-# Disease class names (update according to your model)
+# ---------------- Disease Classes ----------------
 class_names = [
     'Apple__Apple_scab', 'Apple__Black_rot', 'Apple__Cedar_apple_rust', 'Apple__healthy',
     'Corn_(maize)__Cercospora_leaf_spot Gray_leaf_spot', 'Corn_(maize)__Common_rust_',
@@ -54,7 +39,7 @@ class_names = [
     'Tomato__Target_Spot', 'Tomato__Tomato_mosaic_virus', 'Tomato__Tomato_Yellow_Leaf_Curl_Virus', 'Tomato__healthy'
 ]
 
-# Enhanced disease information with step-by-step instructions
+# ---------------- Disease Info ----------------
 disease_info = {
     # 🍎 Apple Diseases
     "Apple__Apple_scab": {
@@ -657,10 +642,8 @@ disease_info = {
     }
 }
 
-
-
+# ---------------- Database Setup ----------------
 def init_db():
-    """Initialize the database"""
     conn = sqlite3.connect('agrox_database.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS diagnoses
@@ -672,8 +655,8 @@ def init_db():
     conn.commit()
     conn.close()
 
+# ---------------- Image Preprocessing ----------------
 def preprocess_image(img_path):
-    """Preprocess image for model prediction"""
     try:
         img = image.load_img(img_path, target_size=(224, 224))
         img_array = image.img_to_array(img)
@@ -684,33 +667,32 @@ def preprocess_image(img_path):
         print(f"Error preprocessing image: {e}")
         return None
 
+# ---------------- Prediction ----------------
 def predict_disease(img_path):
-    """Predict disease from image"""
     if model is None:
         return None, 0.0
-    
+
     img_array = preprocess_image(img_path)
     if img_array is None:
         return None, 0.0
-    
+
     try:
         predictions = model.predict(img_array)
         predicted_class_index = np.argmax(predictions[0])
         confidence = float(predictions[0][predicted_class_index])
         predicted_disease = class_names[predicted_class_index]
-        
         return predicted_disease, confidence
     except Exception as e:
         print(f"Error during prediction: {e}")
         return None, 0.0
 
+# ---------------- Routes ----------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/dashboard')
 def dashboard():
-    # Get recent diagnoses from database
     conn = sqlite3.connect('agrox_database.db')
     c = conn.cursor()
     c.execute('SELECT * FROM diagnoses ORDER BY timestamp DESC LIMIT 10')
@@ -735,32 +717,29 @@ def diagnose():
     if 'file' not in request.files:
         flash('No file selected')
         return redirect(request.url)
-    
+
     file = request.files['file']
     if file.filename == '':
         flash('No file selected')
         return redirect(request.url)
-    
+
     if file:
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_")
         filename = timestamp + filename
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        
-        # Predict disease
+
         predicted_disease, confidence = predict_disease(filepath)
-        
+
         if predicted_disease:
-            # Save to database
             conn = sqlite3.connect('agrox_database.db')
             c = conn.cursor()
             c.execute('INSERT INTO diagnoses (filename, predicted_disease, confidence) VALUES (?, ?, ?)',
                      (filename, predicted_disease, confidence))
             conn.commit()
             conn.close()
-            
-            # Get disease info
+
             disease_details = disease_info.get(predicted_disease, {
                 "pesticide": "Unknown",
                 "dosage": "Consult expert",
@@ -772,28 +751,23 @@ def diagnose():
                 "safety": "Follow standard safety measures",
                 "youtube_videos": []
             })
-            
-            return render_template('results.html', 
-                                 filename=filename,
-                                 predicted_disease=predicted_disease,
-                                 confidence=confidence*100,
-                                 disease_details=disease_details)
+
+            return render_template('results.html',
+                                   filename=filename,
+                                   predicted_disease=predicted_disease,
+                                   confidence=confidence*100,
+                                   disease_details=disease_details)
         else:
             flash('Error processing image. Please try again.')
             return redirect(url_for('crop_doctor'))
 
 @app.route('/api/voice_command', methods=['POST'])
 def voice_command():
-    """Handle voice commands"""
     data = request.get_json()
     command = data.get('command', '').lower()
-    
-    response = {
-        'success': True,
-        'message': 'Command received',
-        'action': None
-    }
-    
+
+    response = {'success': True, 'message': 'Command received', 'action': None}
+
     if 'diagnose' in command or 'crop doctor' in command:
         response['action'] = 'redirect'
         response['url'] = url_for('crop_doctor')
@@ -808,9 +782,10 @@ def voice_command():
         response['message'] = 'Redirecting to Home...'
     else:
         response['message'] = 'Voice command not recognized. Try saying "diagnose", "dashboard", or "home".'
-    
+
     return jsonify(response)
 
+# ---------------- Main ----------------
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
