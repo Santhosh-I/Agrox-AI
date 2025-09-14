@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="highlight">AGROX AI</span>
+                </h1>
+                <p class="hero-subtitle">SMART FARMING MADE INTELLIGENT</p>
+                <p class="hero-description">
+                    Revolutionize your farming with AI-powered crop disease detection, 
+                    yield prediction, and smart recommendations for fertilizers and pesticides.
+                </p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('crop_doctor') }}" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Start Diagnosis
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-chart-line"></i>
+                        View Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="farming-illustration">
+                    <div class="sensor-icon sensor-1">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div class="sensor-icon sensor-2">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <div class="sensor-icon sensor-3">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="sensor-icon sensor-4">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="farm-scene">
+                        <div class="trees">
+                            <div class="tree tree-1"></div>
+                            <div class="tree tree-2"></div>
+                        </div>
+                        <div class="crops">
+                            <div class="crop-row"></div>
+                        </div>
+                        <div class="tractor">
+                            <i class="fas fa-tractor"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features">
+    <div class="container">
+        <h2 class="section-title">AI-Powered Smart Farming Solutions</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3>Disease Detection</h3>
+                <p>Advanced CNN models detect crop diseases from leaf images with 95%+ accuracy</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>Yield Prediction</h3>
+                <p>ML algorithms predict crop yield using soil, weather, and historical data</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h3>Smart Recommendations</h3>
+                <p>Get personalized fertilizer and pesticide recommendations for optimal crop health</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-microphone-alt"></i>
+                </div>
+                <h3>Voice Assistant</h3>
+                <p>Voice-controlled interface with support for regional languages</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-target="95">0</div>
+                <div class="stat-label">% Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="26">0</div>
+                <div class="stat-label">Diseases Detected</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="7">0</div>
+                <div class="stat-label">Crop Types</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="100">0</div>
+                <div class="stat-label">% Free to Use</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

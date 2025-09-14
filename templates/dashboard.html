@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AGROX AI{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Farmer Dashboard</h1>
+            <p>Track your crop health and diagnosis history</p>
+        </div>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-microscope"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ recent_diagnoses|length }}</h3>
+                    <p>Recent Diagnoses</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>26</h3>
+                    <p>Diseases Detectable</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>7</h3>
+                    <p>Supported Crops</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>95%</h3>
+                    <p>AI Accuracy</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h2><i class="fas fa-history"></i> Recent Diagnoses</h2>
+            {% if recent_diagnoses %}
+            <div class="diagnosis-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Disease Detected</th>
+                            <th>Confidence</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for diagnosis in recent_diagnoses %}
+                        <tr>
+                            <td>
+                                <img src="{{ url_for('static', filename='uploads/' + diagnosis[1]) }}" 
+                                     alt="Plant Image" class="table-image">
+                            </td>
+                            <td>
+                                <span class="disease-name">{{ diagnosis[2].replace('_', ' ').title() }}</span>
+                            </td>
+                            <td>
+                                <span class="confidence-badge">{{ "%.1f"|format(diagnosis[3] * 100) }}%</span>
+                            </td>
+                            <td>{{ diagnosis[4] }}</td>
+                            <td>
+                                <button class="btn-small btn-primary">View Details</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="no-data">
+                <i class="fas fa-search"></i>
+                <h3>No diagnoses yet</h3>
+                <p>Start by uploading your first plant image for analysis</p>
+                <a href="{{ url_for('crop_doctor') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Start First Diagnosis
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

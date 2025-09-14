@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Diagnosis Results - AGROX AI{% endblock %}
+
+{% block content %}
+<section class="results">
+    <div class="container">
+        <div class="results-header">
+            <h1><i class="fas fa-clipboard-check"></i> Diagnosis Results</h1>
+        </div>
+
+        <div class="results-content">
+            <div class="diagnosis-summary">
+                <div class="uploaded-image">
+                    <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Plant Image">
+                </div>
+                <div class="diagnosis-info">
+                    <h2>{{ predicted_disease.replace('_', ' ').title() }}</h2>
+                    <div class="confidence-meter">
+                        <div class="confidence-label">Confidence Level</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: {{ confidence }}%"></div>
+                        </div>
+                        <div class="confidence-value">{{ "%.1f"|format(confidence) }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="treatment-details">
+                <div class="detail-card">
+                    <h3><i class="fas fa-pills"></i> Recommended Treatment</h3>
+                    <div class="treatment-info">
+                        <div class="info-row">
+                            <span class="label">Pesticide:</span>
+                            <span class="value">{{ disease_details.pesticide }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Dosage:</span>
+                            <span class="value">{{ disease_details.dosage }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Estimated Cost:</span>
+                            <span class="value cost">{{ disease_details.cost }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Best Timing:</span>
+                            <span class="value">{{ disease_details.timing }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fas fa-list-ol"></i> Step-by-Step Instructions</h3>
+                    <ol class="treatment-steps">
+                        {% for step in disease_details.steps %}
+                        <li>{{ step }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fas fa-shield-alt"></i> Safety Guidelines</h3>
+                    <div class="safety-info">
+                        <p>{{ disease_details.safety }}</p>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <h3><i class="fas fa-eye"></i> Prevention Tips</h3>
+                    <div class="prevention-info">
+                        <p>{{ disease_details.prevention }}</p>
+                    </div>
+                </div>
+
+                {% if disease_details.youtube_videos %}
+                <div class="detail-card">
+                    <h3><i class="fab fa-youtube"></i> Educational Videos</h3>
+                    <div class="video-links">
+                        {% for video in disease_details.youtube_videos %}
+                        <a href="{{ video.url }}" target="_blank" class="video-link">
+                            <i class="fas fa-play"></i>
+                            {{ video.title }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('crop_doctor') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Diagnose Another Plant
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i>
+                    Print Results
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline">
+                    <i class="fas fa-chart-line"></i>
+                    View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

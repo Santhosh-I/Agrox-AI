@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Crop Doctor - AGROX AI{% endblock %}
+
+{% block content %}
+<section class="crop-doctor">
+    <div class="container">
+        <div class="doctor-header">
+            <h1><i class="fas fa-stethoscope"></i> Crop Doctor</h1>
+            <p>Upload an image of your plant leaves to get instant disease diagnosis and treatment recommendations</p>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-container">
+                <form method="post" action="{{ url_for('diagnose') }}" enctype="multipart/form-data" id="uploadForm">
+                    <div class="file-upload-wrapper">
+                        <input type="file" name="file" id="fileInput" accept="image/*" required>
+                        <div class="file-upload-display" id="fileUploadDisplay">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drop your image here or click to browse</h3>
+                            <p>Supports: JPG, PNG, JPEG (Max 16MB)</p>
+                        </div>
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImg" src="" alt="Preview">
+                            <button type="button" id="removeImage" class="remove-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="upload-actions">
+                        <button type="submit" class="btn btn-primary" id="analyzeBtn" disabled>
+                            <i class="fas fa-microscope"></i>
+                            Analyze Plant
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="diagnosis-tips">
+                <h3><i class="fas fa-lightbulb"></i> Tips for Better Results</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Take clear, well-lit photos</li>
+                    <li><i class="fas fa-check"></i> Focus on affected leaf areas</li>
+                    <li><i class="fas fa-check"></i> Avoid blurry or dark images</li>
+                    <li><i class="fas fa-check"></i> Include multiple leaves if possible</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="supported-crops">
+            <h3>Supported Crops</h3>
+            <div class="crop-tags">
+                <span class="crop-tag"><i class="fas fa-apple-alt"></i> Apple</span>
+                <span class="crop-tag"><i class="fas fa-seedling"></i> Corn</span>
+                <span class="crop-tag"><i class="fas fa-grape-cluster"></i> Grapes</span>
+                <span class="crop-tag"><i class="fas fa-pepper-hot"></i> Pepper</span>
+                <span class="crop-tag"><i class="fas fa-potato"></i> Potato</span>
+                <span class="crop-tag"><i class="fas fa-tomato"></i> Tomato</span>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

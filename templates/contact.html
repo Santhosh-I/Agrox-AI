@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Contact - AGROX AI{% endblock %}
+
+{% block content %}
+<section class="contact">
+    <div class="container">
+        <div class="contact-header">
+            <h1><i class="fas fa-envelope"></i> Contact Us</h1>
+            <p>Get in touch with our agricultural technology experts</p>
+        </div>
+
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Address</h3>
+                    <p>Tech Knox Solutions<br>
+                    Smart Farming Division<br>
+                    Agricultural Tech Hub</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3>Phone</h3>
+                    <p>+91-XXXX-XXXXXX<br>
+                    Available 24/7 for farmers</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Email</h3>
+                    <p>support@agrox-ai.com<br>
+                    farmers@techknox.com</p>
+                </div>
+            </div>
+
+            <div class="contact-form-container">
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Select a topic</option>
+                            <option value="technical_support">Technical Support</option>
+                            <option value="disease_identification">Disease Identification Help</option>
+                            <option value="feature_request">Feature Request</option>
+                            <option value="partnership">Partnership Inquiry</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="support-section">
+            <h2><i class="fas fa-headset"></i> 24/7 Farmer Support</h2>
+            <div class="support-features">
+                <div class="support-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <h4>Emergency Helpline</h4>
+                    <p>Immediate assistance for critical crop issues</p>
+                </div>
+                <div class="support-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h4>Training Programs</h4>
+                    <p>Learn to use AI tools for better farming</p>
+                </div>
+                <div class="support-item">
+                    <i class="fas fa-users"></i>
+                    <h4>Farmer Community</h4>
+                    <p>Connect with other progressive farmers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

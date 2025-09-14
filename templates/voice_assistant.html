@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Assistant - AGROX AI{% endblock %}
+
+{% block content %}
+<section class="voice-assistant">
+    <div class="container">
+        <div class="voice-header">
+            <h1><i class="fas fa-microphone-alt"></i> Voice Assistant</h1>
+            <p>Speak naturally to navigate and control AGROX AI</p>
+        </div>
+
+        <div class="voice-interface">
+            <div class="voice-visualizer" id="voiceVisualizer">
+                <div class="pulse-circle"></div>
+                <div class="mic-icon">
+                    <i class="fas fa-microphone"></i>
+                </div>
+            </div>
+            
+            <div class="voice-status" id="voiceStatus">
+                <p>Click the microphone to start listening</p>
+            </div>
+
+            <div class="voice-controls">
+                <button id="startListening" class="btn btn-primary voice-btn">
+                    <i class="fas fa-microphone"></i>
+                    Start Listening
+                </button>
+                <button id="stopListening" class="btn btn-secondary voice-btn" style="display: none;">
+                    <i class="fas fa-stop"></i>
+                    Stop Listening
+                </button>
+            </div>
+
+            <div class="recognized-text" id="recognizedText">
+                <h3>What you said:</h3>
+                <p id="spokenText">Your speech will appear here...</p>
+            </div>
+        </div>
+
+        <div class="voice-commands">
+            <h3><i class="fas fa-list"></i> Voice Commands</h3>
+            <div class="commands-grid">
+                <div class="command-card">
+                    <div class="command-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li>"Go to home"</li>
+                        <li>"Open dashboard"</li>
+                        <li>"Show crop doctor"</li>
+                        <li>"Contact page"</li>
+                    </ul>
+                </div>
+                <div class="command-card">
+                    <div class="command-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h4>Diagnosis</h4>
+                    <ul>
+                        <li>"Start diagnosis"</li>
+                        <li>"Analyze plant"</li>
+                        <li>"Check crop health"</li>
+                        <li>"Diagnose disease"</li>
+                    </ul>
+                </div>
+                <div class="command-card">
+                    <div class="command-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h4>Information</h4>
+                    <ul>
+                        <li>"Show results"</li>
+                        <li>"View history"</li>
+                        <li>"Latest diagnosis"</li>
+                        <li>"Help me"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
