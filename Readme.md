@@ -1,10 +1,10 @@
-# AI-Powered Smart Farming & Crop Disease Prediction 🌾
+# Agrox AI 🌾
 
 ## Problem Statement
 Farmers face losses due to unpredictable weather, pests, and crop diseases. Manual monitoring is inefficient, time-consuming, and often reactive.
 
 ## Goal
-Develop an AI system to:
+Agrox AI aims to:
 - **Detect crop diseases** from leaf images using CNN models.
 - **Predict crop yield** based on soil, weather, and historical data.
 - **Provide recommendations** for fertilizers, pesticides, and irrigation using ML.
