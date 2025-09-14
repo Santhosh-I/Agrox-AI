@@ -19,14 +19,27 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 # Create upload directory if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Load ML model
+# Load ML model with error handling and version compatibility
 print("Loading AI model...")
 try:
-    model = load_model('model/plant_disease_model.h5')
+    # Try loading with compile=False first
+    model = load_model('model/plant_disease_model.h5', compile=False)
     print("✅ Model loaded successfully!")
 except Exception as e:
-    print(f"❌ Error loading model: {e}")
-    model = None
+    print(f"❌ Error loading model with compile=False: {e}")
+    try:
+        # Try with custom objects for compatibility
+        import tensorflow as tf
+        model = tf.keras.models.load_model(
+            'model/plant_disease_model.h5',
+            custom_objects=None,
+            compile=False
+        )
+        print("✅ Model loaded successfully with custom_objects!")
+    except Exception as e2:
+        print(f"❌ Error loading model with custom_objects: {e2}")
+        model = None
+
 
 # Disease class names (update according to your model)
 class_names = [
