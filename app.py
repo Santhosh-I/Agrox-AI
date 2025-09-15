@@ -768,7 +768,7 @@ def voice_command():
 
     response = {'success': True, 'message': 'Command received', 'action': None}
 
-    if 'diagnose' in command or 'crop doctor' in command or 'Crop Dr.' in command:
+    if 'diagnose' in command or 'crop dr' in command:
         response['action'] = 'redirect'
         response['url'] = url_for('crop_doctor')
         response['message'] = 'Redirecting to Crop Doctor...'
